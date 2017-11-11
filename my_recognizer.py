@@ -1,6 +1,6 @@
 import warnings
 from asl_data import SinglesData
-
+from hmmlearn.hmm import GaussianHMM
 
 def recognize(models: dict, test_set: SinglesData):
     """ Recognize test word sequences from word models set
@@ -21,5 +21,23 @@ def recognize(models: dict, test_set: SinglesData):
     probabilities = []
     guesses = []
     # TODO implement the recognizer
-    # return probabilities, guesses
-    raise NotImplementedError
+    items = test_set.get_all_Xlengths()
+    for item in items:
+        best_score = float('-inf')
+        best_guess = None
+        item_prob = {}
+        item_X, item_lengths = items[item]
+        for word, model in models.items():
+            try:
+                score = model.score(item_X)
+            except:
+                score = float('-inf')
+            item_prob[word] = score
+            if score > best_score:
+                best_score = score
+                best_guess = word
+        probabilities.append(item_prob)
+        guesses.append(best_guess)
+
+    return probabilities, guesses
+    # raise NotImplementedError
